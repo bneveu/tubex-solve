@@ -2,10 +2,10 @@
 #  tubex-solve - cmake configuration file
 # ==================================================================
 
-#cmake_minimum_required (VERSION 3.0.2)
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required (VERSION 3.0.2)
 
-#project (TUBEX_SOLVE VERSION 0.42 LANGUAGES CXX)
+
+project (TUBEX_SOLVE VERSION 2)
 set (TUBEX_SOLVE_DESCRIPTION "Short description of the plugin")
 
 ################################################################################
@@ -52,21 +52,16 @@ set(CMAKE_CXX_FLAGS     "${CMAKE_CXX_FLAGS} -DNDEBUG") # comment for debug
 ################################################################################
 # Looking for Ibex, Tubex
 ################################################################################
-#find_package (IBEX 2.8.3 REQUIRED)
-#include (FindPkgConfig)
-#pkg_search_module (IBEX REQUIRED ibex)
-#message (STATUS "Found Ibex version ${IBEX_VERSION}")
-#pkg_search_module (TUBEX REQUIRED tubex)
-#message (STATUS "Found Tubex version ${TUBEX_VERSION}")
 
-set(TUBEX_INCLUDE_DIRS "/certis/3/neveub/RECHERCHE/tubex/tubex2/tubex-lib/make/include"
-                       "/certis/3/neveub/RECHERCHE/tubex/tubex2/tubex-lib/make/src/core"
-                       "/certis/3/neveub/RECHERCHE/ibex/ibex2-8/ibex-lib/include/ibex"
-                       "/certis/3/neveub/RECHERCHE/ibex/ibex2-8/ibex-lib/include"
-                       "/certis/3/neveub/RECHERCHE/ibex/ibex2-8/ibex-lib/include/ibex/3rd")
-link_directories("/certis/3/neveub/RECHERCHE/tubex/tubex2/tubex-lib/make/src/core"
-                 "/certis/3/neveub/RECHERCHE/ibex/ibex2-8/ibex-lib/lib"
-                 "/certis/3/neveub/RECHERCHE/ibex/ibex2-8/ibex-lib/lib/ibex/3rd")
+set(TUBEX_INCLUDE_DIRS "/home/neveub/tubex/tubex-lib/build/include"
+                       "/home/neveub/tubex/ibex-lib/install/include/ibex"
+                       "/home/neveub/tubex/ibex-lib/install/include"
+                       "/home/neveub/tubex/ibex-lib/install/include/ibex/3rd"
+		       )
+
+link_directories("/home/neveub/tubex/tubex-lib/build/src/core"
+  "/home/neveub/tubex/ibex-lib/install/lib"
+  "/home/neveub/tubex/ibex-lib/install/lib/ibex/3rd")
 
 #set(TUBEX_LDFLAGS "tubex" "ibex" "gaol" "ultim" "gdtoa")
 
