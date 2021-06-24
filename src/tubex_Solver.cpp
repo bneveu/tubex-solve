@@ -1,4 +1,3 @@
-
 /* ============================================================================
  *  tubex-lib - Solver class
  * ============================================================================
@@ -16,8 +15,6 @@
 #include "tubex_Solver.h"
 #include "tubex_Exception.h"
 #define GRAPHICS 0
-#include <cmath>
-#include<float.h>
 
 
 
@@ -82,13 +79,11 @@ namespace tubex
     m_trace = trace;
   }
 
-
   void Solver::set_max_slices(int max_slices)
   {
     m_max_slices=max_slices;
   }
   
-
   void Solver::set_refining_mode(int refining_mode)
   {
     m_refining_mode=refining_mode;
@@ -103,6 +98,7 @@ namespace tubex
   {
     m_stopping_mode=stopping_mode;
   }
+
   void Solver::set_var3b_external_contraction (bool external_contraction)
   {
     m_var3b_external_contraction=external_contraction;
@@ -147,7 +143,7 @@ namespace tubex
     if  (m_refining_mode == 1)
       {  // one slice is refined
       
-      // double t_refining = x[0].wider_slice()->domain().mid() // the widest slice            
+      // double t_refining = x[0].wider_slice()->tdomain().mid() // the widest slice            
       double t_refining= x.steepest_slice()->tdomain().mid();    
       x.sample(t_refining);
       // cout << "refining point " << t_refining << endl;
@@ -159,7 +155,7 @@ namespace tubex
 	refining_all_slices(x);
 	return true;
       }
-    else if (m_refining_mode== 2 || m_refining_mode== 3){
+    else if (m_refining_mode== 2 || m_refining_mode== 3){ // first, 10% of the slices (the widest) are refined
       int nb_refining = nb_slices/10 +1;
       for (int k=0; k< nb_refining; k++){
 
@@ -170,6 +166,7 @@ namespace tubex
       refining_with_threshold(x);
       return true;
     }
+    else return false;
   }
 
   void Solver::refining_all_slices(TubeVector & x) {
@@ -193,13 +190,11 @@ namespace tubex
   // the refining is focused on slices  with a larger than average (or median) max difference (in all dimensions)  between input and output gates
   void Solver::refining_with_threshold (TubeVector & x){
     int nb_slices_before = x[0].nb_slices();
-    vector<double> t_refining;
     vector<double>  slice_step;
 
     double step_threshold=0;
-    if (m_refining_mode==2) step_threshold= average_refining_threshold(x, slice_step, t_refining);
-    else if (m_refining_mode==3) step_threshold= median_refining_threshold(x, slice_step, t_refining);
-
+    if (m_refining_mode==2) step_threshold= average_refining_threshold(x, slice_step);
+    else if (m_refining_mode==3) step_threshold= median_refining_threshold(x, slice_step);
     double min_diam=(x.tdomain().diam() / (100 * nb_slices_before));      
     for (int i=0; i<x.size();i++)
       {
@@ -225,7 +220,7 @@ namespace tubex
 
 
 
-  double Solver::median_refining_threshold (const TubeVector &x, vector<double> & slice_step, vector<double>& t_refining) {
+  double Solver::median_refining_threshold (const TubeVector &x, vector<double> & slice_step){
 
 	double step_threshold;
 	vector<double> stepmed;
@@ -234,7 +229,6 @@ namespace tubex
 	  s[k]=x[k].first_slice();
 
 	for (const Slice*slice=s[0]; slice!=NULL; slice=slice->next_slice()){
-	  t_refining.push_back(slice->tdomain().mid());
 	  //          cout << " t_refining " << slice->tdomain().mid() << endl;
 	  double step_max= fabs(slice->output_gate().mid() - slice->input_gate().mid());
 
@@ -260,7 +254,9 @@ namespace tubex
 
  
 
-  double Solver::average_refining_threshold(const TubeVector &x, vector<double> & slice_step, vector<double>& t_refining) {
+  double Solver::average_refining_threshold(const TubeVector &x, vector<double> & slice_step)
+    
+  {
         int nbsteps=0;
 	double step_threshold;
 
@@ -269,7 +265,7 @@ namespace tubex
 	  s[k]=x[k].first_slice();
 
 	for (const Slice*slice=s[0]; slice!=NULL; slice=slice->next_slice()){
-	  t_refining.push_back(slice->tdomain().mid());
+
 	  double step_max= fabs(slice->output_gate().mid() - slice->input_gate().mid());
 
 	  for (int k=1; k< x.size(); k++){
@@ -364,8 +360,8 @@ namespace tubex
     #if GRAPHICS
     m_fig->show(true);
     #endif
+    
     double t_init=x0[0].tdomain().lb();
-
     list<pair<pair<int,double>,TubeVector> > s;
     s.push_back(make_pair(make_pair(0,t_init), x0));
     list<TubeVector> l_solutions;
@@ -381,9 +377,9 @@ namespace tubex
       bool emptiness;
       double volume_before_refining;
       
-
       bool incremental =0;
       if (level >0) incremental=1;
+
       contraction_step(x, f, ctc_func,incremental,t_bisect);
      
       emptiness = x.is_empty();
@@ -412,7 +408,6 @@ namespace tubex
       // 3. Bisection
       emptiness=x.is_empty();
       if(!emptiness)
-
         {
           if(stopping_condition_met(x) || m_bisection_timept==-2 )
           {
@@ -614,20 +609,9 @@ namespace tubex
     else
       return diam_stopping_condition (x);
   }
-  /*
+ 
+
   bool Solver::diam_stopping_condition(const TubeVector& x)
-  {
-    Vector x_max_thickness = x.max_diam();
-    for(int i = 0 ; i < x.size() ; i++)
-
-
-      if(x_max_thickness[i] > m_max_thickness[i])
-        return false;
-    return true;
-  }
-  */
-
-bool Solver::diam_stopping_condition(const TubeVector& x)
   {
   
     for(int i = 0 ; i < x.size() ; i++){
@@ -665,6 +649,18 @@ bool Solver::diam_stopping_condition(const TubeVector& x)
     return true;
   }
 
+  double Solver::extreme_gates_sumofdiams(const TubeVector& x)
+  { double sum=0.0;	
+    for(int i = 0 ; i < x.size() ; i++)
+      {
+	//       cout << i << x[i].first_slice()->input_gate() << "  " << x[i].last_slice()->output_gate() << endl;					
+       sum+=x[i].first_slice()->input_gate().diam();
+       sum+=x[i].last_slice()->output_gate().diam();
+      }
+    return sum;
+  }
+      
+
 
   bool Solver::fixed_point_reached(double volume_before, double volume_after, float fxpt_ratio)
   {
@@ -674,6 +670,8 @@ bool Solver::diam_stopping_condition(const TubeVector& x)
     return (volume_after / volume_before >= fxpt_ratio);
   }
 
+  //  ------------------------------------------------------CONTRACTION----------------------------------------------
+  
   void Solver::picard_contraction (TubeVector &x, const TFnc& f){
     if (x.volume()>= DBL_MAX){
       //      cout << " volume before picard " << x.volume() << endl;
@@ -748,7 +746,7 @@ bool Solver::diam_stopping_condition(const TubeVector& x)
 
 
   void Solver::contraction_step(TubeVector &x, TFnc* f, void (*ctc_func)(TubeVector&, double t0, bool incremental),  bool incremental, double t0) {
-	//  Fixed_Point_Contractions up to the fixed point
+    //  Fixed_Point_Contractions up to the fixed point
     fixed_point_contraction(x, f, ctc_func, m_propa_fxpt_ratio, incremental, t0);
     
     bool emptiness = x.is_empty();
@@ -756,7 +754,7 @@ bool Solver::diam_stopping_condition(const TubeVector& x)
 	
     if (!emptiness && m_var3b_fxpt_ratio >= 0.0)
       fixed_point_var3b(x, f, ctc_func);
-   
+    
   }
 
 
@@ -765,18 +763,27 @@ bool Solver::diam_stopping_condition(const TubeVector& x)
   {
     if  (propa_fxpt_ratio <0.0) return;
     double volume_before_ctc;
+    double volume_after_ctc;
+    
     do
       {
-	volume_before_ctc = x.volume();
+	if (m_stopping_mode==2)
+	  volume_before_ctc = extreme_gates_sumofdiams(x);
+	else
+	  volume_before_ctc = x.volume();
 	contraction (x, f, ctc_func, incremental, t0, v3b);
+	if (m_stopping_mode==2)
+	  volume_after_ctc = extreme_gates_sumofdiams(x);
+	else
+	  volume_after_ctc = x.volume();
+	
 	incremental=false;
-
       }
 
     while(!(x.is_empty()) 
 	  && propa_fxpt_ratio >0
-	  && !fixed_point_reached(volume_before_ctc, x.volume(), propa_fxpt_ratio));
-    //    cout << v3b << " tube after fixed_point_contraction " <<  x << " volume after " << x.volume() << endl;
+	  && !fixed_point_reached(volume_before_ctc, volume_after_ctc, propa_fxpt_ratio));
+    
   }
   
   
@@ -791,7 +798,7 @@ bool Solver::diam_stopping_condition(const TubeVector& x)
     if (f){                     // ODE contraction
 	  
       if (m_contraction_mode==4){   // CtcPicard + CtcDeriv
-	picard_contraction(x,*f);
+	if (!v3b) picard_contraction(x,*f);
 	deriv_contraction(x,*f, t0, incremental);
       }
       else if (m_contraction_mode <=2 ){                   // CtcIntegration 
@@ -802,7 +809,7 @@ bool Solver::diam_stopping_condition(const TubeVector& x)
     }
   }
   
-  // -------------------- VAR3B ----------------------------------
+  //----------------- -------------------- VAR3B ----------------------------------
 
 
   void Solver::fixed_point_var3b(TubeVector &x, TFnc * f,void (*ctc_func) (TubeVector&,double t0,bool incremental)){
@@ -829,7 +836,7 @@ bool Solver::diam_stopping_condition(const TubeVector& x)
 
    
     int contraction_mode = m_contraction_mode;
-    m_contraction_mode=4;  // var3B calls CtcDeriv as internal contractor 
+    m_contraction_mode=4;  // var3B calls CtcDeriv as internal ODE contractor 
     // incremental contractors using CtcIntegration are too weak and non incremental contractors as
     // CtcIntegration with CtcDyncid or CtcDyncidGuess are too costly
     //    cout << " var3b " << x << endl;

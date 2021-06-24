@@ -46,15 +46,14 @@ namespace tubex
 
       /* slicing fixed point ratio : used for stopping the slicing*/
       void set_refining_fxpt_ratio(float refining_fxpt_ratio); 
-
       /* contraction fixed point ratio : used by the algorithm managing the whole sequence of contractors (external contract fonction and ODE contractor) called after a slicing and after a bisection*/
       void set_propa_fxpt_ratio(float propa_fxpt_ratio);
       /* var3b fix point ratio (for managing the sequence of var3b calls) */
       void set_var3b_fxpt_ratio(float var3b_fxpt_ratio);
-      /* for managing the sequence of contractors used by the var3b subcontraction. (ctcDeriv and possibly CtcVnode).*/
+      /* for managing the sequence of contractors used by the var3b subcontraction. (ctcDeriv and possibly calls to externel contractors as CtcVnode or CtcCapd).*/
       void set_var3b_propa_fxpt_ratio(float propa_fxpt_ratio);
 
-      /* Slice choice for var3b
+      /* Time choice for var3b
       where do the var3b contraction : 
       1 domain.ub(); 
       -1 domain.lb(); 
@@ -95,7 +94,7 @@ namespace tubex
 
       /* calling external contraction (function contract) during var3b subcontractions 
       0 for not calling external contraction during var3b; 
-      1 for calling external contractor during var3b used for calling  ctcvnode inside var3b contractions.*/
+      1 for calling external contractor during var3b used for calling  ctcvnode or ctccapd inside var3b contractions.*/
       void set_var3b_external_contraction (bool external_contraction) ; 
 
       /* trace during search : 
@@ -106,7 +105,7 @@ namespace tubex
 
      
       /* the solve method, it has for parameters a tube vector x0 , and 3 possibilities
-         -  a tube vector contractor ctc_func (for general problems as Integrodifferential problems and/or for using ctcvnode )
+         - a tube vector contractor ctc_func (for general problems as Integrodifferential problems and/or for using ctcVnode )
          - a differential function (TFnc computing the derivative of a tube vector) (for pure ODEs)
          - a differential function and a tube vector contractor (for ODE problems with side constraints and/or calls to ctcVnode)
          The returned results are tubes containing the solutions. Two tubes have at least a disjoint gate.
@@ -130,9 +129,11 @@ namespace tubex
       bool gate_stopping_condition(const TubeVector& x);
       bool diam_stopping_condition(const TubeVector& x);
       bool boundarygate_stopping_condition(const TubeVector& x);
+      double extreme_gates_sumofdiams (const TubeVector& x);
       bool fixed_point_reached(double volume_before, double volume_after, float fxpt_ratio);
 
       void bisection (const TubeVector &x, list<pair<pair<int,double>,TubeVector> > &s, int level);
+    
       void contraction_step(TubeVector &x, TFnc* f, void (*ctc_func)(TubeVector&,  double t0, bool incremental), bool incremental, double t0);
       void fixed_point_contraction (TubeVector &x, TFnc* f, void (*ctc_func)(TubeVector&, double t0, bool incremental), float propa_fxpt_ratio, bool incremental, double t0, bool v3b=false);
       void contraction (TubeVector &x, TFnc * f,
@@ -145,29 +146,28 @@ namespace tubex
       void var3b(TubeVector &x,TFnc* f, void (*ctc_func)(TubeVector&, double t0, bool incremental));
 
       bool refining (TubeVector &x);
-      double average_refining_threshold(const TubeVector &x, 
-				vector<double>& slice_step, vector<double>& t_refining);
-      double median_refining_threshold(const TubeVector &x, 
-				vector<double>& slice_step, vector<double>& t_refining);
+      double average_refining_threshold(const TubeVector &x, vector<double>& slice_step);
+      double median_refining_threshold(const TubeVector &x, vector<double>& slice_step);
       void refining_with_threshold(TubeVector & x);
       void refining_all_slices(TubeVector & x);
 
       void bisection_guess (TubeVector & x, TFnc& f);
       std::pair<int,std::pair<double,double>> bisection_guess(TubeVector x, TubeVector v, DynCtc* slice_ctr, TFnc& fnc, int variant);
       std::pair<int,std::pair<double,double>> bisection_guess(TubeVector x, TubeVector v, DynCtc* slice_ctr, TFnc& fnc);
-
+      void print_solutions(const list<TubeVector> & l_solutions);
+      void display_solutions(const list<TubeVector> & l_solutions);
+    
       ibex::Vector m_max_thickness = ibex::Vector(1);
+    
       float m_refining_fxpt_ratio = 0.005;
       float m_propa_fxpt_ratio = 0.0 ; // one call no fix point
       float m_var3b_fxpt_ratio = -1;   // no var3b
       float m_var3b_propa_fxpt_ratio = 0.0;
       /* Internal parameters for var3b algorithm */
-      //float m_var3b_bisection_minrate = 0.0001;
       float m_var3b_bisection_minrate = 0.01;
       float m_var3b_bisection_maxrate = 0.4;
       int m_var3b_bisection_ratefactor=2;
-      void print_solutions(const list<TubeVector> & l_solutions);
-      void display_solutions(const list<TubeVector> & l_solutions);
+      
       int m_var3b_timept=0;
       int m_bisection_timept=0;
       int m_trace=0;
