@@ -767,14 +767,19 @@ namespace tubex
     
     do
       {
-	if (m_stopping_mode==2)
+	/*	if (m_stopping_mode==2)
 	  volume_before_ctc = extreme_gates_sumofdiams(x);
 	else
+	*/
 	  volume_before_ctc = x.volume();
+	//	cout << " before contraction 3b " << v3b << endl;
 	contraction (x, f, ctc_func, incremental, t0, v3b);
+	//	cout << " after contraction 3b " << endl;
+	/*
 	if (m_stopping_mode==2)
 	  volume_after_ctc = extreme_gates_sumofdiams(x);
 	else
+	*/
 	  volume_after_ctc = x.volume();
 	
 	incremental=false;
@@ -792,7 +797,8 @@ namespace tubex
 			    bool incremental, double t0 , bool v3b)
   {
     if (ctc_func && (!v3b || m_var3b_external_contraction))
-      {ctc_func(x, t0, incremental);  // Other constraints contraction
+      { 
+	ctc_func(x, t0, incremental);  // Other constraints contraction
 	incremental=false;
       }
     if (f){                     // ODE contraction
@@ -820,9 +826,13 @@ namespace tubex
 	  { 
 	    volume_before_var3b=x.volume();
 	    if  (x.volume() < DBL_MAX)
-	    //	    cout << " volume before var3b "  << x.volume() << endl;
-	      var3b(x, f, ctc_func);
-	    //	    cout << " volume after var3b "  << x.volume() << endl;
+	      cout << " volume before var3b "  << x.volume() << " x " << x << endl;
+	    for (int i=0; i< x.size() ; i++)
+	      cout << i << " " << x[i].first_slice()->input_gate() << endl;
+	    var3b(x, f, ctc_func);
+	    cout << " volume after var3b "  << x.volume() << " x " << x <<  endl;
+	     for (int i=0; i< x.size() ; i++)
+	      cout << i << " " << x[i].first_slice()->input_gate() << endl;
 	    emptiness = x.is_empty();
 	  }
       while (!emptiness  
@@ -853,7 +863,7 @@ namespace tubex
     }
     else
       x.max_gate_diam(t_bisection);  
-    //    cout << " t_bisection var3b " << t_bisection << endl;
+    cout << " t_bisection var3b " << t_bisection << endl;
     for(int k=0; k<x.size() ; k++)
       {
 
@@ -863,9 +873,9 @@ namespace tubex
 	  try
 	    {pair<TubeVector,TubeVector> p_x = x.bisect(t_bisection,k,rate);
              
-	     //	     cout << " x gate " << x[0].first_slice()->output_gate()  << endl;
 
 	      fixed_point_contraction(p_x.first, f, ctc_func, m_var3b_propa_fxpt_ratio, true, t_bisection, true);
+
               if (p_x.first.is_empty())
 		x=p_x.second;
 	     //	     else {x = p_x.second | p_x.first ; break;}
@@ -878,6 +888,7 @@ namespace tubex
 	    {break;}
 	}
 
+
 	fixed_point_contraction(x,f, ctc_func, m_var3b_propa_fxpt_ratio, true, t_bisection, true);
 
 	rate = 1 - m_var3b_bisection_minrate;
@@ -885,6 +896,7 @@ namespace tubex
 	while (rate > 1-m_var3b_bisection_maxrate ){
 	  try{
 	    pair<TubeVector,TubeVector> p_x = x.bisect(t_bisection,k,rate);
+
 
 	    fixed_point_contraction(p_x.second, f, ctc_func, m_var3b_propa_fxpt_ratio, true, t_bisection, true);
 
@@ -898,8 +910,8 @@ namespace tubex
 	  catch (Exception& )
 	    {break;}
 	}
+	fixed_point_contraction(x,f , ctc_func, m_var3b_propa_fxpt_ratio, true, t_bisection,true);
 
-	fixed_point_contraction(x,f , ctc_func, m_var3b_propa_fxpt_ratio, true , t_bisection,true);
 	
       }
     m_contraction_mode=contraction_mode;
