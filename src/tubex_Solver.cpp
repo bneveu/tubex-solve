@@ -826,13 +826,7 @@ namespace tubex
 	  { 
 	    volume_before_var3b=x.volume();
 	    if  (x.volume() < DBL_MAX)
-	      cout << " volume before var3b "  << x.volume() << " x " << x << endl;
-	    for (int i=0; i< x.size() ; i++)
-	      cout << i << " " << x[i].first_slice()->input_gate() << endl;
-	    var3b(x, f, ctc_func);
-	    cout << " volume after var3b "  << x.volume() << " x " << x <<  endl;
-	     for (int i=0; i< x.size() ; i++)
-	      cout << i << " " << x[i].first_slice()->input_gate() << endl;
+	      var3b(x, f, ctc_func);
 	    emptiness = x.is_empty();
 	  }
       while (!emptiness  
@@ -863,7 +857,6 @@ namespace tubex
     }
     else
       x.max_gate_diam(t_bisection);  
-    cout << " t_bisection var3b " << t_bisection << endl;
     for(int k=0; k<x.size() ; k++)
       {
 
