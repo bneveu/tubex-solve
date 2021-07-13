@@ -65,7 +65,15 @@ link_directories("/home/neveub/tubex/codac-lib/build/src/core"
 
 #set(CODAC_LDFLAGS "tubex" "ibex" "gaol" "ultim" "gdtoa")
 
-set(CODAC_LDFLAGS "tubex" "ibex" "prim")
+set(CODAC_LDFLAGS "codac" "ibex" "prim")
+
+find_package(Eigen3 REQUIRED NO_MODULE)
+  message(STATUS "Found Eigen3 version ${EIGEN3_VERSION}")
+  add_definitions(${EIGEN3_DEFINITIONS})
+  include_directories(${EIGEN3_INCLUDE_DIRS})
+
+  add_definitions(-Dtubex=codac)
+
 
 ################################################################################
 # Compile sources

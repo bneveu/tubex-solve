@@ -10,7 +10,7 @@
  *              the GNU Lesser General Public License (LGPL).
  */
 
-#include "tubex.h"
+#include "codac.h"
 #include "tubex-solve.h"
 
 using namespace std;
