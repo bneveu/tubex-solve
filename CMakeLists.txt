@@ -53,15 +53,15 @@ set(CMAKE_CXX_FLAGS     "${CMAKE_CXX_FLAGS} -DNDEBUG") # comment for debug
 # Looking for Ibex, Codac
 ################################################################################
 
-set(CODAC_INCLUDE_DIRS "/home/neveub/tubex/codac-lib/build/include"
-                       "/home/neveub/tubex/ibex-lib/install/include/ibex"
-                       "/home/neveub/tubex/ibex-lib/install/include"
-                       "/home/neveub/tubex/ibex-lib/install/include/ibex/3rd"
+set(CODAC_INCLUDE_DIRS "/libre/neveu/codac-lib/build/include"
+                       "/libre/neveu/ibex-lib/install/include/ibex"
+                       "/libre/neveu/ibex-lib/install/install/include"
+                       "/libre/neveu/ibex-lib/install/include/ibex/3rd"
 		       )
 
-link_directories("/home/neveub/tubex/codac-lib/build/src/core"
-  "/home/neveub/tubex/ibex-lib/install/lib"
-  "/home/neveub/tubex/ibex-lib/install/lib/ibex/3rd")
+link_directories("/libre/neveu/codac-lib/build/src/core"
+  "/libre/neveu/ibex-lib/install/lib"
+  "/libre/neveu/ibex-lib/install/lib/ibex/3rd")
 
 #set(CODAC_LDFLAGS "tubex" "ibex" "gaol" "ultim" "gdtoa")
 

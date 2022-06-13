@@ -1,10 +1,10 @@
-#include "tubex.h"
+#include "codac.h"
 #include "tubex-solve.h"
 #include <iomanip>
 
 using namespace std;
 using namespace ibex;
-using namespace tubex;
+using namespace codac;
 
 /* ode : y=-x^2 */
 /* problem defined in Deville,Janssen and Van Hentenryck paper */

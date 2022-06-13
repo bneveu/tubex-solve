@@ -10,14 +10,14 @@
  *              the GNU Lesser General Public License (LGPL).
  */
 
-#include "tubex.h"
+#include "codac.h"
 #include "tubex-solve.h"
 #include "ibex_CtcHC4.h"
 #include "ibex_SystemFactory.h"
 
 using namespace std;
 using namespace ibex;
-using namespace tubex;
+using namespace codac;
 
 class FncIntegroDiff : public TFnc {
   public: 

@@ -1,11 +1,11 @@
 #include "math.h"
-#include "tubex.h"
+#include "codac.h"
 #include "tubex-solve.h"
 #include <iomanip>
 
 using namespace std;
  using namespace ibex;
-using namespace tubex;
+using namespace codac;
 
 void contract(TubeVector& x)
 {
